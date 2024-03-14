@@ -23,6 +23,13 @@ const userSchema = new Schema({
 		type: String,
 		required: true,
 	},
+	image: {
+		id: String,
+		url: {
+			type: String,
+			default: process.env.DEFAULT_PROFILE_IMG,
+		},
+	},
 	role: 'admin' | 'user' | 'author',
 	books: [
 		{
