@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+import bcrypt from 'bcrypt';
 
 const userSchema = new Schema({
 	username: {
@@ -30,7 +31,11 @@ const userSchema = new Schema({
 			default: process.env.DEFAULT_PROFILE_IMG,
 		},
 	},
-	role: 'admin' | 'user' | 'author',
+	role: {
+		type: String,
+		enum: ['admin', 'user', 'author'],
+		default: 'user',
+	},
 	books: [
 		{
 			type: Schema.Types.ObjectId,
@@ -47,6 +52,30 @@ const userSchema = new Schema({
 		type: Boolean,
 		default: false,
 	},
+});
+
+userSchema.pre('save', async function (next) {
+	if (!this.isModified('password')) {
+		return next();
+	}
+	const hash = await bcrypt.hash(
+		this.password,
+		Number(process.env.HASH_NUMBER)
+	);
+	this.password = hash;
+	next();
+});
+
+userSchema.pre('updateOne', async function (next) {
+	const update = this.getUpdate();
+	if (update.password && typeof update.password === 'string') {
+		const hash = await bcrypt.hash(
+			update.password,
+			Number(process.env.HASH_NUMBER)
+		);
+		update.password = hash;
+	}
+	next();
 });
 
 const User = model('User', userSchema);

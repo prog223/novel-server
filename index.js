@@ -1,8 +1,15 @@
-import express from 'express';
-import * as dotenv from 'dotenv';
 import cors from 'cors';
+import * as dotenv from 'dotenv';
+import express from 'express';
 import mongoose from 'mongoose';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import exphbs from 'express-handlebars';
 dotenv.config();
+
+import authRoute from './routes/auth.route.js';
+
+export const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 mongoose
 	.connect(process.env.MONGODB_URL)
@@ -19,6 +26,19 @@ app.use(
 		credentials: true,
 	})
 );
+app.engine('handlebars', exphbs.engine());
+app.set('view engine', 'handlebars');
+app.set('views', __dirname, 'templates');
+
+app.use('/api/auth', authRoute);
+
+app.use((err, req, res, next) => {
+	if (!err.status) {
+		return res.status(500).send('Something went wrong');
+	}
+
+	return res.status(err.status).send(err.message);
+});
 
 app.listen(process.env.PORT, () => {
 	console.log(`Server running on port ${process.env.PORT}`);
