@@ -2,7 +2,7 @@ import mail from 'nodemailer';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
-import handlebars from 'handlebars'
+import handlebars from 'handlebars';
 import { __dirname } from '../index.js';
 
 dotenv.config();
@@ -22,21 +22,21 @@ const replaceHTML = function (html, obj) {
 
 const renderVerificationEmail = async (link, templateName) => {
 	try {
-	  const templatePath = path.join(__dirname, 'templates', templateName);
-	  const template = fs.readFileSync(templatePath, 'utf8');
- 
-	  const compiledTemplate = handlebars.compile(template);
+		const templatePath = path.join(__dirname, 'templates', templateName);
+		const template = fs.readFileSync(templatePath, 'utf8');
 
-	  const html = compiledTemplate({ link });
-	  return html;
+		const compiledTemplate = handlebars.compile(template);
+
+		const html = compiledTemplate({ link });
+		return html;
 	} catch (err) {
-	  console.error('Error rendering email template:', err);
-	  throw err;
+		console.error('Error rendering email template:', err);
+		throw err;
 	}
- };
+};
 
 const sendEmail = async (to, link, template) => {
-	const html = await renderVerificationEmail(link, template)
+	const html = await renderVerificationEmail(link, template);
 
 	let transporter = mail.createTransport({
 		host: process.env.contactHost,

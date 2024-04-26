@@ -5,10 +5,12 @@ import mongoose from 'mongoose';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import exphbs from 'express-handlebars';
+import verifyToken from './middleware/jwt.js';
 dotenv.config();
 
 import authRoute from './routes/auth.route.js';
 import bookRoute from './routes/book.route.js';
+import userRoute from './routes/user.route.js';
 
 export const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -32,14 +34,17 @@ app.set('view engine', 'handlebars');
 app.set('views', __dirname, 'templates');
 
 app.use('/api/auth', authRoute);
-app.use('/api/book', bookRoute);
+app.use('/api/book', verifyToken, bookRoute);
+app.use('/api/user', verifyToken, userRoute);
 
 app.use((err, req, res, next) => {
 	if (!err.status) {
-		return res.status(500).send('Something went wrong');
+		return res
+			.status(500)
+			.send({ success: false, message: 'Something went wrong' });
 	}
 
-	return res.status(err.status).send(err.message);
+	return res.status(err.status).send({ success: false, message: err.message });
 });
 
 app.listen(process.env.PORT, () => {
