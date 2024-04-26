@@ -8,6 +8,7 @@ import exphbs from 'express-handlebars';
 dotenv.config();
 
 import authRoute from './routes/auth.route.js';
+import bookRoute from './routes/book.route.js';
 
 export const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -31,6 +32,7 @@ app.set('view engine', 'handlebars');
 app.set('views', __dirname, 'templates');
 
 app.use('/api/auth', authRoute);
+app.use('/api/book', bookRoute);
 
 app.use((err, req, res, next) => {
 	if (!err.status) {
