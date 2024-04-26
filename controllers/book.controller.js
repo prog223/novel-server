@@ -7,7 +7,7 @@ export const createBook = async (req, res, next) => {
 		const book = new Book(req.body);
 		book.save();
 		if (!book) return next(createError(500, 'Something went wrong'));
-		res.status(200).send(book);
+		res.status(200).send({ success: true, data: book });
 	} catch (error) {
 		next(error);
 	}
@@ -22,25 +22,22 @@ export const getBooks = async (req, res, next) => {
 			filter = { genre: genre._id };
 		}
 
-		const localBooksQuery = Book.find({
+		const totalCount = await Book.countDocuments();
+		const pagination = paginate(totalCount, q.page, q.pageSize);
+
+		const books = await Book.find({
 			...filter,
 			...(q.search && { name: { $regex: q.search, $options: 'i' } }),
 		})
 			.populate('genre')
-			.populate('author');
+			.populate('author')
+			.skip((q.page - 1) * q.pageSize)
+			.limit(q.pageSize)
+			.exec();
 
-		const localBooks = await localBooksQuery.exec();
+		if (!books.length) return next(createError(404, 'Books not found'));
 
-		const page = parseInt(q.page) || 1;
-		const pageSize = parseInt(q.pageSize) || 10;
-		const startIndex = (page - 1) * pageSize;
-		const endIndex = startIndex + pageSize;
-		const paginatedBooks = localBooks.slice(startIndex, endIndex);
-
-		if (!paginatedBooks.length)
-			return next(createError(404, 'Books not found'));
-
-		res.status(200).send(paginatedBooks);
+		res.status(200).send({ success: true, data: books, pagination });
 	} catch (err) {
 		next(err);
 	}
@@ -51,7 +48,7 @@ export const getBook = async (req, res, next) => {
 		const book = await Book.findById(req.params.id);
 		if (!book) return next(createError(404, 'Book not found'));
 
-		res.status(200).send(book);
+		res.status(200).send({ success: true, data: book });
 	} catch (err) {
 		next(err);
 	}
@@ -63,7 +60,11 @@ export const updateBook = async (req, res, next) => {
 			new: true,
 		});
 
-		res.status(200).send(updatedBook);
+		res.status(200).send({
+			success: true,
+			data: updatedBook,
+			message: 'Book successfully updated',
+		});
 	} catch (err) {
 		next(err);
 	}
@@ -71,10 +72,13 @@ export const updateBook = async (req, res, next) => {
 
 export const deleteBook = async (req, res, next) => {
 	try {
-		await Book.findByIdAndDelete(req.params.id)
+		await Book.findByIdAndDelete(req.params.id);
 
-		res.status(200).send('Book successfully deleted')
+		res.status(200).send({
+			success: true,
+			message: 'Book successfully deleted',
+		});
 	} catch (err) {
-		next(err)
+		next(err);
 	}
 };
