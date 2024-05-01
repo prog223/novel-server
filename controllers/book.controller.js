@@ -5,11 +5,12 @@ import createError from '../utils/createError.js';
 export const createBook = async (req, res, next) => {
 	try {
 		const book = new Book(req.body);
-		book.save();
+		await book.save();
+
 		if (!book) return next(createError(500, 'Something went wrong'));
 		res.status(200).send({ success: true, data: book });
-	} catch (error) {
-		next(error);
+	} catch (err) {
+		next(err);
 	}
 };
 
@@ -34,8 +35,6 @@ export const getBooks = async (req, res, next) => {
 			.skip((q.page - 1) * q.pageSize)
 			.limit(q.pageSize)
 			.exec();
-
-		if (!books.length) return next(createError(404, 'Books not found'));
 
 		res.status(200).send({ success: true, data: books, pagination });
 	} catch (err) {

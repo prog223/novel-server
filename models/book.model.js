@@ -65,6 +65,10 @@ const bookSchema = new Schema(
 			type: Schema.Types.ObjectId,
 			ref: 'User',
 		},
+		bookshelf: {
+			type: Schema.Types.ObjectId || null,
+			ref: 'Bookshelf',
+		},
 	},
 	{
 		timestamps: true,

@@ -1,7 +1,6 @@
 import User from '../models/user.model.js';
 import createError from '../utils/createError.js';
 import { paginate } from '../utils/utils.js';
-import Bookshelf from '../models/bookshelf.model.js';
 import { sendEmail } from '../utils/sendEmail.js';
 
 export const getUsers = async (req, res, next) => {
@@ -17,8 +16,6 @@ export const getUsers = async (req, res, next) => {
 			.skip((q.page - 1) * q.pageSize)
 			.limit(q.pageSize)
 			.exec();
-
-		if (!users.length) return next(createError(404, 'Users not found'));
 
 		res.status(200).send({ success: true, data: users, pagination });
 	} catch (err) {
@@ -38,7 +35,6 @@ export const getUser = async (req, res, next) => {
 
 		res.status(200).send({ success: true, data: info });
 	} catch (err) {
-		console.log(err);
 		next(err);
 	}
 };
@@ -47,7 +43,11 @@ export const deleteUser = async (req, res, next) => {
 	try {
 		const user = await User.findByIdAndDelete(req.params.id);
 
-      sendEmail(user.email, process.env.contactEmail, 'delete_account.handlebars')
+		sendEmail(
+			user.email,
+			process.env.contactEmail,
+			'delete_account.handlebars'
+		);
 		res.status(200).send({
 			success: true,
 			message: 'User successfully deleted',

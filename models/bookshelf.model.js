@@ -12,6 +12,10 @@ const bookshelfSchema = new Schema(
 				ref: 'Book',
 			},
 		],
+		isPrivate: {
+			type: Boolean,
+			default: false,
+		},
 		user: {
 			type: Schema.Types.ObjectId,
 			ref: 'User',
