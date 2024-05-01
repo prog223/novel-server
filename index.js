@@ -12,6 +12,7 @@ import authRoute from './routes/auth.route.js';
 import bookRoute from './routes/book.route.js';
 import userRoute from './routes/user.route.js';
 import bookshelfRoute from './routes/bookshelf.route.js';
+import genreRoute from './routes/genre.route.js';
 
 export const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -35,9 +36,10 @@ app.set('view engine', 'handlebars');
 app.set('views', __dirname, 'templates');
 
 app.use('/api/auth', authRoute);
-app.use('/api/book', bookRoute);
+app.use('/api/book', verifyToken, bookRoute);
 app.use('/api/user', verifyToken, userRoute);
-app.use('/api/bookshelf', bookshelfRoute);
+app.use('/api/bookshelf', verifyToken, bookshelfRoute);
+app.use('/api/genre', verifyToken, genreRoute);
 
 app.use((err, req, res, next) => {
 	if (!err.status) {
