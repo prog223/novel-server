@@ -44,7 +44,7 @@ export const getBooks = async (req, res, next) => {
 
 export const getBook = async (req, res, next) => {
 	try {
-		const book = await Book.findById(req.params.id);
+		const book = await Book.findById(req.params.id).populate('reviews')
 		if (!book) return next(createError(404, 'Book not found'));
 
 		res.status(200).send({ success: true, data: book });
