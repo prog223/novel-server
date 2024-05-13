@@ -6,13 +6,14 @@ import {
 	getBooks,
 	updateBook,
 } from '../controllers/book.controller.js';
+import adminAccess from '../middleware/adminAccess.js';
 
 const router = express.Router();
 
-router.get('/:id', getBook);
 router.get('/get_books', getBooks);
-router.post('/', createBook);
-router.post('/update_book', updateBook);
-router.delete('/:id', deleteBook);
+router.get('/:id', getBook);
+router.post('/', adminAccess, createBook);
+router.post('/update_book', adminAccess, updateBook);
+router.delete('/:id', adminAccess, deleteBook);
 
 export default router;

@@ -41,7 +41,7 @@ export const getUser = async (req, res, next) => {
 
 export const deleteUser = async (req, res, next) => {
 	try {
-		const user = await User.findByIdAndDelete(req.params.id);
+		const user = await User.deleteOne({ _id: req.params.id });
 
 		sendEmail(
 			user.email,

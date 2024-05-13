@@ -15,7 +15,7 @@ export const createReview = async (req, res, next) => {
 		if (isExist) {
 			return next(createError(500, 'You already add review for this book'));
 		} else {
-			const review = await new Review(req.body).save();
+			const review = await new Review({...req.body, user}).save();
 			res.status(201).send({
 				success: true,
 				data: { ...review._doc, user },

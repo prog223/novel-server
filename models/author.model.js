@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+import Book from './book.model.js';
 
 const authorSchema = new Schema({
 	name: {
@@ -21,6 +22,12 @@ const authorSchema = new Schema({
 			ref: 'Book',
 		},
 	],
+});
+
+authorSchema.pre('deleteOne', async function (next) {
+	const author = await Author.findById(this._conditions);
+	await Book.deleteMany({ author });
+	next();
 });
 
 const Author = model('Author', authorSchema);

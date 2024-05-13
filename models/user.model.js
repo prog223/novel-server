@@ -1,5 +1,7 @@
 import { Schema, model } from 'mongoose';
 import bcrypt from 'bcrypt';
+import Book from './book.model.js';
+import Review from './review.model.js';
 
 const userSchema = new Schema({
 	username: {
@@ -75,6 +77,13 @@ userSchema.pre('updateOne', async function (next) {
 		);
 		update.password = hash;
 	}
+	next();
+});
+
+userSchema.pre('deleteOne', async function (next) {
+	const user = await User.findById(this._conditions);
+	await Book.deleteMany({ userAuthor: user });
+	await Review.deleteMany({ user });
 	next();
 });
 
