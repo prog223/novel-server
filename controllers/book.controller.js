@@ -1,15 +1,17 @@
 import Book from '../models/book.model.js';
 import Genre from '../models/genre.model.js';
 import createError from '../utils/createError.js';
+import { paginate } from '../utils/utils.js';
 
 export const createBook = async (req, res, next) => {
 	try {
 		const book = new Book(req.body);
-		book.save();
+		await book.save();
+
 		if (!book) return next(createError(500, 'Something went wrong'));
 		res.status(200).send({ success: true, data: book });
-	} catch (error) {
-		next(error);
+	} catch (err) {
+		next(err);
 	}
 };
 
@@ -31,11 +33,13 @@ export const getBooks = async (req, res, next) => {
 		})
 			.populate('genre')
 			.populate('author')
+			.populate({
+				path: 'userAuthor',
+				select: 'name surname email',
+			})
 			.skip((q.page - 1) * q.pageSize)
 			.limit(q.pageSize)
 			.exec();
-
-		if (!books.length) return next(createError(404, 'Books not found'));
 
 		res.status(200).send({ success: true, data: books, pagination });
 	} catch (err) {
@@ -45,7 +49,13 @@ export const getBooks = async (req, res, next) => {
 
 export const getBook = async (req, res, next) => {
 	try {
-		const book = await Book.findById(req.params.id);
+		const book = await Book.findById(req.params.id)
+			.populate('reviews')
+			.populate('author')
+			.populate({
+				path: 'userAuthor',
+				select: 'name surname email',
+			});
 		if (!book) return next(createError(404, 'Book not found'));
 
 		res.status(200).send({ success: true, data: book });
@@ -72,7 +82,7 @@ export const updateBook = async (req, res, next) => {
 
 export const deleteBook = async (req, res, next) => {
 	try {
-		await Book.findByIdAndDelete(req.params.id);
+		await Book.deleteOne({_id: req.params.id});
 
 		res.status(200).send({
 			success: true,

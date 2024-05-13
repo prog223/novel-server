@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+import Review from './review.model.js';
 
 const bookSchema = new Schema(
 	{
@@ -65,11 +66,21 @@ const bookSchema = new Schema(
 			type: Schema.Types.ObjectId,
 			ref: 'User',
 		},
+		bookshelf: {
+			type: Schema.Types.ObjectId || null,
+			ref: 'Bookshelf',
+		},
 	},
 	{
 		timestamps: true,
 	}
 );
+
+bookSchema.pre('deleteOne', async function (next) {
+	const book = await Book.findById(this._conditions);
+	await Review.deleteMany({ book });
+	next();
+});
 
 const Book = model('Book', bookSchema);
 

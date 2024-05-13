@@ -34,7 +34,10 @@ export const register = async (req, res, next) => {
 		await sendEmail(newUser.email, link, 'verification_email.handlebars');
 
 		await newUser.save();
-		res.status(201).send('User successfully created');
+		res.status(201).send({
+			success: true,
+			message: 'User successfully created',
+		});
 	} catch (err) {
 		next(err);
 	}
@@ -88,7 +91,7 @@ export const login = async (req, res, next) => {
 			secure: true,
 		})
 			.status(200)
-			.send(info);
+			.send({ success: true, data: info });
 	} catch (err) {
 		next(err);
 	}
@@ -101,7 +104,7 @@ export const logout = (req, res, next) => {
 			secure: true,
 		})
 			.status(200)
-			.send('User has been logged out');
+			.send({ success: true, message: 'User has been logged out' });
 	} catch (err) {
 		next(err);
 	}
@@ -131,7 +134,10 @@ export const resetPasswordRequest = async (req, res, next) => {
 		const link = `${process.env.CLIENT_URL}/password_reset?token=${resetToken}&id=${user._id}`;
 		await sendEmail(user.email, link, 'reset_password.handlebars');
 
-		res.status(200).send('Reset password instructions sended to your email');
+		res.status(200).send({
+			success: true,
+			message: 'Reset password instructions sended to your email',
+		});
 	} catch (err) {
 		next(err);
 	}
@@ -163,7 +169,10 @@ export const resetPassword = async (req, res, next) => {
 
 		await passwordResetToken.deleteOne();
 
-		res.status(200).send('Password successfully updated');
+		res.status(200).send({
+			success: true,
+			message: 'Password successfully updated',
+		});
 	} catch (err) {
 		next(err);
 	}
@@ -182,7 +191,10 @@ export const updatePassword = async (req, res, next) => {
 			{ new: true }
 		);
 
-		res.status(200).send('Password successfully updated');
+		res.status(200).send({
+			success: true,
+			message: 'Password successfully updated',
+		});
 	} catch (err) {
 		next(err);
 	}

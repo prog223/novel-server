@@ -9,6 +9,8 @@ const reviewSchema = new Schema(
 		rate: {
 			type: Number,
 			required: true,
+			min: 0,
+			max: 5,
 		},
 		book: {
 			type: Schema.Types.ObjectId,

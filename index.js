@@ -11,6 +11,10 @@ dotenv.config();
 import authRoute from './routes/auth.route.js';
 import bookRoute from './routes/book.route.js';
 import userRoute from './routes/user.route.js';
+import bookshelfRoute from './routes/bookshelf.route.js';
+import genreRoute from './routes/genre.route.js';
+import reviewRoute from './routes/review.route.js';
+import authorRoute from './routes/author.route.js';
 
 export const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -36,6 +40,10 @@ app.set('views', __dirname, 'templates');
 app.use('/api/auth', authRoute);
 app.use('/api/book', verifyToken, bookRoute);
 app.use('/api/user', verifyToken, userRoute);
+app.use('/api/bookshelf', verifyToken, bookshelfRoute);
+app.use('/api/genre', verifyToken, genreRoute);
+app.use('/api/review', verifyToken, reviewRoute);
+app.use('/api/author', authorRoute);
 
 app.use((err, req, res, next) => {
 	if (!err.status) {
