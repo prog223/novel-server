@@ -1,6 +1,32 @@
+import Book from '../models/book.model.js';
 import Review from '../models/review.model.js';
 import User from '../models/user.model.js';
 import createError from '../utils/createError.js';
+import { paginate } from '../utils/utils.js';
+
+export const getBookReviews = async (req, res, next) => {
+	try {
+		const q = req.query;
+		const book = await Book.findById(req.bookId);
+
+		const totalCount = await Review.countDocuments({ book });
+		const pagination = paginate(totalCount, q.page, q.pageSize);
+
+		const reviews = await Review.find({ book })
+			.populate({
+				path: 'user',
+				select: 'name surname username image',
+			})
+			.sort({ createdAt: -1 })
+			.skip((q.page - 1) * q.pageSize)
+			.limit(q.pageSize)
+			.exec();
+
+		res.status(200).send({ success: true, data: reviews, pagination });
+	} catch (err) {
+		next(err);
+	}
+};
 
 export const createReview = async (req, res, next) => {
 	try {
@@ -15,7 +41,7 @@ export const createReview = async (req, res, next) => {
 		if (isExist) {
 			return next(createError(500, 'You already add review for this book'));
 		} else {
-			const review = await new Review({...req.body, user}).save();
+			const review = await new Review({ ...req.body, user }).save();
 			res.status(201).send({
 				success: true,
 				data: { ...review._doc, user },
@@ -59,9 +85,19 @@ export const updateReview = async (req, res, next) => {
 
 export const getUserReviews = async (req, res, next) => {
 	try {
-		const reviews = await Review.find({ user: req.userId }).populate('book');
+		const q = req.query;
 
-		res.status(200).send({ success: true, data: reviews });
+		const totalCount = await Review.countDocuments({ user: req.userId });
+		const pagination = paginate(totalCount, q.page, q.pageSize);
+
+		const reviews = await Review.find({ user: req.userId })
+			.populate('book')
+			.sort({ createdAt: -1 })
+			.skip((q.page - 1) * q.pageSize)
+			.limit(q.pageSize)
+			.exec();
+
+		res.status(200).send({ success: true, data: reviews, pagination });
 	} catch (err) {
 		next(err);
 	}
