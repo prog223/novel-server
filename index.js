@@ -43,7 +43,7 @@ app.use('/api/user', verifyToken, userRoute);
 app.use('/api/bookshelf', verifyToken, bookshelfRoute);
 app.use('/api/genre', verifyToken, genreRoute);
 app.use('/api/review', verifyToken, reviewRoute);
-app.use('/api/author', authorRoute);
+app.use('/api/author', verifyToken, authorRoute);
 
 app.use((err, req, res, next) => {
 	if (!err.status) {

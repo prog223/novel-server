@@ -15,7 +15,7 @@ const router = express.Router();
 router.post('/', createReview);
 router.post('/update', updateReview);
 router.delete('/:id', deleteReview);
-router.get('/get_book_reviews', getBookReviews);
+router.get('/get_book_reviews/:id', getBookReviews);
 router.get('/', getUserReviews);
 router.post('/add_response', addResponse);
 router.post('/delete_response', deleteResponse);

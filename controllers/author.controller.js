@@ -50,24 +50,25 @@ export const updateAuthor = async (req, res, next) => {
 
 export const getAuthors = async (req, res, next) => {
 	try {
-		const q = req.query;
-		let filter = {};
+		// const q = req.query;
+		// let filter = {};
 
-		const totalCount = await Author.countDocuments();
-		const pagination = paginate(totalCount, q.page, q.pageSize);
+		// const totalCount = await Author.countDocuments();
+		// const pagination = paginate(totalCount, q.page, q.pageSize);
 
-		const authors = await Author.find({
-			...filter,
-			$or: [
-				{ name: { $regex: q.search, $options: 'i' } },
-				{ surname: { $regex: q.search, $options: 'i' } },
-			],
-		})
-			.skip((q.page - 1) * q.pageSize)
-			.limit(q.pageSize)
-			.exec();
+		// const authors = await Author.find({
+		// 	...filter,
+		// 	$or: [
+		// 		{ name: { $regex: q.search, $options: 'i' } },
+		// 		{ surname: { $regex: q.search, $options: 'i' } },
+		// 	],
+		// })
+		// 	.skip((q.page - 1) * q.pageSize)
+		// 	.limit(q.pageSize)
+		// 	.exec();
 
-		res.status(200).send({ success: true, data: authors, pagination });
+		const authors = await Author.find()
+		res.status(200).send({ success: true, data: authors });
 	} catch (err) {
 		next(err);
 	}

@@ -7,7 +7,7 @@ import { paginate } from '../utils/utils.js';
 export const getBookReviews = async (req, res, next) => {
 	try {
 		const q = req.query;
-		const book = await Book.findById(req.bookId);
+		const book = await Book.findById(req.params.bookId);
 
 		const totalCount = await Review.countDocuments({ book });
 		const pagination = paginate(totalCount, q.page, q.pageSize);

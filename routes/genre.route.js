@@ -9,7 +9,7 @@ import adminAccess from '../middleware/adminAccess.js';
 const router = express.Router();
 
 router.get('/', getGenres);
-router.post('/', adminAccess, adminAccess, createGenre);
+router.post('/', adminAccess, createGenre);
 router.delete('/:id', adminAccess, adminAccess, deleteGenre);
 
 export default router;
